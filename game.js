@@ -9,19 +9,21 @@ const BOARD_HEIGHT = 31;
 const CANVAS_WIDTH = BOARD_WIDTH * CELL_SIZE;
 const CANVAS_HEIGHT = BOARD_HEIGHT * CELL_SIZE;
 
-// Game colors
+// Game colors - Cyberpunk Neon Theme
 const COLORS = {
-    WALL: '#FF00FF',           // Hot magenta neon
-    DOT: '#39FF14',            // Neon green
-    POWER_PELLET: '#FFFF00',   // Electric yellow
-    AGENT: '#00A896',          // Petrol green GridAgent chip
-    AGENT_DARK: '#2D2D2D',     // Dark chip center
-    // Anomaly colors (from the graphic)
+    WALL: '#FF00FF',           // Neon magenta walls
+    WALL_INNER: '#1a0a2e',     // Dark purple inner
+    WALL_CIRCUIT: '#cc00cc',   // Circuit trace color
+    DOT: '#00FF88',            // Bright neon green dots
+    POWER_PELLET: '#FFFF00',   // Glowing yellow power pellets
+    AGENT: '#00f0ff',          // Cyan GridAgent
+    AGENT_DARK: '#001a1a',     // Dark teal center
+    // Anomaly colors
     ANOMALY_CENTER: '#F5B041', // Golden yellow center
     ANOMALY_RING: '#E67E22',   // Orange ring
     ANOMALY_OUTER: '#FF5733',  // Red-orange outer pixels
     ANOMALY_DARK: '#2D2D2D',   // Dark center
-    BACKGROUND: '#000000'      // Pure black
+    BACKGROUND: '#050510'      // Deep dark blue-black
 };
 
 // Game board layout (28x31) - Circuit Board Design
@@ -137,58 +139,76 @@ class GridAgent {
         
         ctx.save();
         
+        // Glowing effect
+        ctx.shadowColor = COLORS.AGENT;
+        ctx.shadowBlur = 15;
+        
         const chipColor = COLORS.AGENT;
         
+        // Main chip body
         ctx.fillStyle = chipColor;
         ctx.fillRect(x + 1, y + 1, size - 2, size - 2);
         
-        const innerSize = size * 0.45;
+        ctx.shadowBlur = 0;
+        
+        // Inner dark area
+        const innerSize = size * 0.5;
         const innerOffset = (size - innerSize) / 2;
         ctx.fillStyle = COLORS.AGENT_DARK;
         ctx.fillRect(x + innerOffset, y + innerOffset, innerSize, innerSize);
         
+        // Connection pins with glow
         ctx.fillStyle = chipColor;
         const pinSize = 2;
         const numPins = 3;
         
         for (let i = 0; i < numPins; i++) {
             const px = x + size * 0.25 + i * (size * 0.25);
-            ctx.fillRect(px, y - 1, pinSize, 3);
-            ctx.fillRect(px, y + size - 2, pinSize, 3);
+            ctx.fillRect(px, y - 2, pinSize, 4);
+            ctx.fillRect(px, y + size - 2, pinSize, 4);
         }
         
         for (let i = 0; i < numPins; i++) {
             const py = y + size * 0.25 + i * (size * 0.25);
-            ctx.fillRect(x - 1, py, 3, pinSize);
-            ctx.fillRect(x + size - 2, py, 3, pinSize);
+            ctx.fillRect(x - 2, py, 4, pinSize);
+            ctx.fillRect(x + size - 2, py, 4, pinSize);
         }
         
-        const cornerLen = 4;
+        // Corner connectors
+        const cornerLen = 5;
         const cornerWidth = 2;
         
-        ctx.fillRect(x - 2, y + 2, cornerWidth, cornerLen);
-        ctx.fillRect(x + 2, y - 2, cornerLen, cornerWidth);
-        ctx.fillRect(x + size, y + 2, cornerWidth, cornerLen);
-        ctx.fillRect(x + size - cornerLen - 2, y - 2, cornerLen, cornerWidth);
-        ctx.fillRect(x - 2, y + size - cornerLen - 2, cornerWidth, cornerLen);
-        ctx.fillRect(x + 2, y + size, cornerLen, cornerWidth);
-        ctx.fillRect(x + size, y + size - cornerLen - 2, cornerWidth, cornerLen);
-        ctx.fillRect(x + size - cornerLen - 2, y + size, cornerLen, cornerWidth);
+        ctx.fillRect(x - 3, y + 2, cornerWidth, cornerLen);
+        ctx.fillRect(x + 2, y - 3, cornerLen, cornerWidth);
+        ctx.fillRect(x + size + 1, y + 2, cornerWidth, cornerLen);
+        ctx.fillRect(x + size - cornerLen - 2, y - 3, cornerLen, cornerWidth);
+        ctx.fillRect(x - 3, y + size - cornerLen - 2, cornerWidth, cornerLen);
+        ctx.fillRect(x + 2, y + size + 1, cornerLen, cornerWidth);
+        ctx.fillRect(x + size + 1, y + size - cornerLen - 2, cornerWidth, cornerLen);
+        ctx.fillRect(x + size - cornerLen - 2, y + size + 1, cornerLen, cornerWidth);
         
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.sin(this.animPhase * 2) * 0.3})`;
+        // Pulsing center core
+        const coreGlow = 0.6 + Math.sin(this.animPhase * 3) * 0.4;
+        ctx.fillStyle = `rgba(0, 240, 255, ${coreGlow})`;
+        ctx.beginPath();
+        ctx.arc(x + size/2, y + size/2, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Direction indicator
+        ctx.fillStyle = '#ffffff';
         const dotSize = 2;
-        let dotX = x + size / 2 - dotSize / 2;
-        let dotY = y + size / 2 - dotSize / 2;
+        let dotX = x + size / 2;
+        let dotY = y + size / 2;
         
         switch (this.direction) {
-            case 0: dotX = x + size - 5; break;
-            case 1: dotY = y + size - 5; break;
-            case 2: dotX = x + 3; break;
-            case 3: dotY = y + 3; break;
+            case 0: dotX = x + size - 4; break;
+            case 1: dotY = y + size - 4; break;
+            case 2: dotX = x + 4; break;
+            case 3: dotY = y + 4; break;
         }
         
         ctx.beginPath();
-        ctx.arc(dotX + dotSize/2, dotY + dotSize/2, dotSize, 0, Math.PI * 2);
+        ctx.arc(dotX, dotY, dotSize, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();
@@ -333,18 +353,20 @@ class Anomaly {
         const size = CELL_SIZE;
         const x = this.x;
         const y = this.y;
-        const pulse = Math.sin(this.animPhase) * 0.15 + 1;
         const pixelSize = 2;
         
         ctx.save();
         
+        // Outer glow effect
+        ctx.shadowColor = COLORS.ANOMALY_CENTER;
+        ctx.shadowBlur = 15 + Math.sin(this.animPhase * 2) * 5;
+        
         // Draw the anomaly pixel art pattern
-        // Outer red/coral pixels in a grid pattern
         ctx.fillStyle = COLORS.ANOMALY_OUTER;
         
         // Top row pixels
         for (let i = 0; i < 7; i++) {
-            if (i === 0 || i === 6) continue; // Skip corners for now
+            if (i === 0 || i === 6) continue;
             ctx.fillRect(x + 3 + i * 2, y, pixelSize, pixelSize);
         }
         
@@ -376,50 +398,39 @@ class Anomaly {
         ctx.fillRect(x + 11, y + size - 4, pixelSize, pixelSize);
         ctx.fillRect(x + 15, y + size - 4, pixelSize, pixelSize);
         
-        // L-shaped corners in red
-        // Top-left L
+        // L-shaped corners
         ctx.fillRect(x + 2, y + 4, pixelSize, 3);
         ctx.fillRect(x + 4, y + 2, 3, pixelSize);
-        
-        // Top-right L
         ctx.fillRect(x + size - 4, y + 4, pixelSize, 3);
         ctx.fillRect(x + size - 7, y + 2, 3, pixelSize);
-        
-        // Bottom-left L
         ctx.fillRect(x + 2, y + size - 7, pixelSize, 3);
         ctx.fillRect(x + 4, y + size - 4, 3, pixelSize);
-        
-        // Bottom-right L
         ctx.fillRect(x + size - 4, y + size - 7, pixelSize, 3);
         ctx.fillRect(x + size - 7, y + size - 4, 3, pixelSize);
         
-        // Orange middle ring/cross
+        ctx.shadowBlur = 0;
+        
+        // Orange middle cross
         ctx.fillStyle = COLORS.ANOMALY_RING;
-        // Horizontal bar
         ctx.fillRect(x + 4, y + 8, 4, 4);
         ctx.fillRect(x + size - 8, y + 8, 4, 4);
-        // Vertical bar  
         ctx.fillRect(x + 8, y + 4, 4, 4);
         ctx.fillRect(x + 8, y + size - 8, 4, 4);
         
-        // Golden yellow center square
+        // Golden yellow center
+        ctx.shadowColor = COLORS.ANOMALY_CENTER;
+        ctx.shadowBlur = 10;
         ctx.fillStyle = COLORS.ANOMALY_CENTER;
         const centerSize = 8;
         const centerOffset = (size - centerSize) / 2;
         ctx.fillRect(x + centerOffset, y + centerOffset, centerSize, centerSize);
         
-        // Dark inner square (the core)
+        // Dark inner core
+        ctx.shadowBlur = 0;
         ctx.fillStyle = COLORS.ANOMALY_DARK;
         const coreSize = 4;
         const coreOffset = (size - coreSize) / 2;
         ctx.fillRect(x + coreOffset, y + coreOffset, coreSize, coreSize);
-        
-        // Pulsing glow effect
-        const glowAlpha = 0.3 + Math.sin(this.animPhase * 2) * 0.2;
-        ctx.fillStyle = `rgba(245, 176, 65, ${glowAlpha})`;
-        ctx.beginPath();
-        ctx.arc(x + size/2, y + size/2, size/2 + 2, 0, Math.PI * 2);
-        ctx.fill();
         
         ctx.restore();
     }
@@ -634,6 +645,7 @@ class GridAgentGame {
     }
 
     draw() {
+        // Dark background
         this.ctx.fillStyle = COLORS.BACKGROUND;
         this.ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -645,19 +657,27 @@ class GridAgentGame {
                 const py = y * CELL_SIZE;
 
                 if (cell === 1) {
-                    this.ctx.fillStyle = COLORS.WALL;
-                    this.ctx.fillRect(px + 2, py + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+                    // Draw neon wall with circuit pattern
+                    this.drawCyberpunkWall(px, py, x, y);
                 } else if (cell === 2) {
+                    // Neon green dot with glow
+                    this.ctx.shadowColor = COLORS.DOT;
+                    this.ctx.shadowBlur = 8;
                     this.ctx.fillStyle = COLORS.DOT;
                     this.ctx.beginPath();
-                    this.ctx.arc(px + CELL_SIZE / 2, py + CELL_SIZE / 2, 2, 0, Math.PI * 2);
+                    this.ctx.arc(px + CELL_SIZE / 2, py + CELL_SIZE / 2, 3, 0, Math.PI * 2);
                     this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
                 } else if (cell === 3) {
-                    const pulse = Math.sin(Date.now() / 200) * 2 + 6;
+                    // Large glowing power pellet
+                    const pulse = Math.sin(Date.now() / 200) * 2 + 8;
+                    this.ctx.shadowColor = COLORS.POWER_PELLET;
+                    this.ctx.shadowBlur = 20;
                     this.ctx.fillStyle = COLORS.POWER_PELLET;
                     this.ctx.beginPath();
                     this.ctx.arc(px + CELL_SIZE / 2, py + CELL_SIZE / 2, pulse, 0, Math.PI * 2);
                     this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
                 }
             }
         }
@@ -667,6 +687,70 @@ class GridAgentGame {
 
         // Draw GridAgent
         this.agent.draw(this.ctx);
+    }
+
+    drawCyberpunkWall(px, py, gridX, gridY) {
+        const ctx = this.ctx;
+        const size = CELL_SIZE;
+        
+        // Outer neon glow
+        ctx.shadowColor = COLORS.WALL;
+        ctx.shadowBlur = 8;
+        
+        // Main wall block with neon border
+        ctx.fillStyle = COLORS.WALL;
+        ctx.fillRect(px + 1, py + 1, size - 2, size - 2);
+        
+        // Inner dark area
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = COLORS.WALL_INNER;
+        ctx.fillRect(px + 3, py + 3, size - 6, size - 6);
+        
+        // Circuit trace patterns inside
+        ctx.strokeStyle = COLORS.WALL_CIRCUIT;
+        ctx.lineWidth = 1;
+        
+        // Create circuit pattern based on position
+        const pattern = (gridX + gridY) % 4;
+        
+        ctx.beginPath();
+        switch (pattern) {
+            case 0:
+                // Horizontal line with node
+                ctx.moveTo(px + 4, py + size/2);
+                ctx.lineTo(px + size - 4, py + size/2);
+                ctx.moveTo(px + size/2, py + size/2 - 3);
+                ctx.lineTo(px + size/2, py + size/2 + 3);
+                break;
+            case 1:
+                // Vertical line with node
+                ctx.moveTo(px + size/2, py + 4);
+                ctx.lineTo(px + size/2, py + size - 4);
+                ctx.moveTo(px + size/2 - 3, py + size/2);
+                ctx.lineTo(px + size/2 + 3, py + size/2);
+                break;
+            case 2:
+                // L-shape
+                ctx.moveTo(px + 4, py + size/2);
+                ctx.lineTo(px + size/2, py + size/2);
+                ctx.lineTo(px + size/2, py + size - 4);
+                break;
+            case 3:
+                // Reverse L-shape
+                ctx.moveTo(px + size - 4, py + size/2);
+                ctx.lineTo(px + size/2, py + size/2);
+                ctx.lineTo(px + size/2, py + 4);
+                break;
+        }
+        ctx.stroke();
+        
+        // Small circuit node dots
+        ctx.fillStyle = COLORS.WALL_CIRCUIT;
+        if (pattern === 0 || pattern === 1) {
+            ctx.beginPath();
+            ctx.arc(px + size/2, py + size/2, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 
     updateDisplay() {

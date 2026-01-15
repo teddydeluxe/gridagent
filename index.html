@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>GRIDAGENT - ARCADE</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,6 +21,18 @@
         </div>
         <div id="instructions">
             <p>Collect all dots and anomalies to advance!</p>
+        </div>
+        
+        <!-- Mobile Controls -->
+        <div id="mobile-controls">
+            <div class="control-row">
+                <button class="control-btn" id="btn-up">▲</button>
+            </div>
+            <div class="control-row">
+                <button class="control-btn" id="btn-left">◀</button>
+                <button class="control-btn" id="btn-down">▼</button>
+                <button class="control-btn" id="btn-right">▶</button>
+            </div>
         </div>
     </div>
     <script src="game.js"></script>

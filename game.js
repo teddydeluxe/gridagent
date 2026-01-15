@@ -507,6 +507,26 @@ class GridAgentGame {
         document.getElementById('restart-btn').addEventListener('click', () => {
             this.resetGame();
         });
+
+        // Mobile controls
+        const setupMobileBtn = (btnId, direction) => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!this.gameOver) this.agent.nextDirection = direction;
+                });
+                btn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    if (!this.gameOver) this.agent.nextDirection = direction;
+                });
+            }
+        };
+
+        setupMobileBtn('btn-up', 3);
+        setupMobileBtn('btn-down', 1);
+        setupMobileBtn('btn-left', 2);
+        setupMobileBtn('btn-right', 0);
     }
 
     startGame() {

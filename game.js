@@ -14,7 +14,7 @@ const COLORS = {
     WALL: '#FF00FF',           // Hot magenta neon
     DOT: '#39FF14',            // Neon green
     POWER_PELLET: '#FFFF00',   // Electric yellow
-    AGENT: '#F06B6B',          // Coral red GridAgent chip
+    AGENT: '#00A896',          // Petrol green GridAgent chip
     AGENT_DARK: '#2D2D2D',     // Dark chip center
     // Anomaly colors (from the graphic)
     ANOMALY_CENTER: '#F5B041', // Golden yellow center
@@ -236,7 +236,7 @@ class Anomaly {
         // Release from spawn area
         if (this.inSpawn) {
             this.releaseTimer++;
-            const releaseTime = { 'alpha': 0, 'beta': 90, 'gamma': 180, 'delta': 270 };
+            const releaseTime = { 'alpha': 0, 'beta': 90, 'gamma': 180, 'delta': 270, 'epsilon': 360, 'zeta': 450 };
             if (this.releaseTimer >= releaseTime[this.type]) {
                 this.inSpawn = false;
                 this.x = 13 * CELL_SIZE;
@@ -449,7 +449,9 @@ class GridAgentGame {
             new Anomaly(12, 15, 'alpha'),
             new Anomaly(15, 15, 'beta'),
             new Anomaly(12, 16, 'gamma'),
-            new Anomaly(15, 16, 'delta')
+            new Anomaly(15, 16, 'delta'),
+            new Anomaly(13, 15, 'epsilon'),
+            new Anomaly(14, 16, 'zeta')
         ];
 
         this.dotCount = this.countDots();
@@ -649,7 +651,7 @@ class GridAgentGame {
 
     updateDisplay() {
         document.getElementById('score').textContent = `Score: ${this.score}`;
-        document.getElementById('lives').textContent = `Anomalies: ${this.anomaliesCollected}/4`;
+        document.getElementById('lives').textContent = `Anomalies: ${this.anomaliesCollected}/6`;
         document.getElementById('level').textContent = `Level: ${this.level}`;
     }
 }

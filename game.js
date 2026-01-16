@@ -580,9 +580,9 @@ class GridAgentGame {
         this.checkDotCollection();
         this.checkAnomalyCollection();
 
-        // Check win - collect all dots AND all anomalies
+        // Check win - collect all anomalies (6/6)
         const allAnomaliesCollected = this.anomalies.every(a => a.collected);
-        if (this.dotCount <= 0 && allAnomaliesCollected) {
+        if (allAnomaliesCollected) {
             // Victory! Redirect to sieya.de
             this.gameRunning = false;
             this.showVictoryAndRedirect();

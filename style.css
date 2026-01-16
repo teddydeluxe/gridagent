@@ -183,20 +183,30 @@ body::before {
     50% { opacity: 0.6; }
 }
 
-/* Mobile Controls */
+/* Mobile Controls - Two thumb layout */
 #mobile-controls {
     margin-top: 20px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    padding-bottom: 30px;
+    padding: 10px 20px 30px 20px;
+    gap: 20px;
 }
 
-.control-row {
+.control-group {
     display: flex;
-    gap: 12px;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.left-controls {
+    align-items: center;
+}
+
+.right-controls {
+    flex-direction: row;
+    gap: 10px;
 }
 
 .control-btn {

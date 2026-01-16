@@ -583,14 +583,48 @@ class GridAgentGame {
         // Check win - collect all dots AND all anomalies
         const allAnomaliesCollected = this.anomalies.every(a => a.collected);
         if (this.dotCount <= 0 && allAnomaliesCollected) {
-            this.level++;
-            this.board = JSON.parse(JSON.stringify(BOARD_LAYOUT));
-            this.dotCount = this.countDots();
-            this.anomaliesCollected = 0;
-            this.agent.reset();
-            this.anomalies.forEach(a => a.reset());
-            this.updateDisplay();
+            // Victory! Redirect to sieya.de
+            this.gameRunning = false;
+            this.showVictoryAndRedirect();
         }
+    }
+
+    showVictoryAndRedirect() {
+        // Show victory message briefly then redirect
+        const victoryDiv = document.createElement('div');
+        victoryDiv.id = 'victory-screen';
+        victoryDiv.innerHTML = `
+            <h2>MISSION COMPLETE!</h2>
+            <p>All anomalies collected!</p>
+            <p>Final Score: ${this.score}</p>
+            <p>Redirecting...</p>
+        `;
+        victoryDiv.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, rgba(0, 50, 50, 0.98), rgba(0, 80, 80, 0.98));
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            border: 3px solid #00f0ff;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+            z-index: 1001;
+            font-family: 'Orbitron', sans-serif;
+            color: #00f0ff;
+        `;
+        victoryDiv.querySelector('h2').style.cssText = `
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00f0ff;
+        `;
+        document.getElementById('game-container').appendChild(victoryDiv);
+
+        // Redirect after 2 seconds
+        setTimeout(() => {
+            window.location.href = 'https://sieya.de';
+        }, 2000);
     }
 
     checkDotCollection() {
